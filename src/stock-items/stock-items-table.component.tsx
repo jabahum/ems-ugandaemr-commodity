@@ -31,8 +31,6 @@ interface StockItemsTableProps {
 const StockItemsTableComponent: React.FC<StockItemsTableProps> = () => {
   const { t } = useTranslation();
 
-  const locations = useLocations();
-
   const desktop = isDesktop(useLayoutType());
 
   const {
@@ -183,15 +181,6 @@ const StockItemsTableComponent: React.FC<StockItemsTableProps> = () => {
                         {t("checkFilters", "Check the filters above")}
                       </p>
                     </div>
-                    <p className={styles.separator}>{t("or", "or")}</p>
-                    {/*<Button*/}
-                    {/*  kind="ghost"*/}
-                    {/*  size="sm"*/}
-                    {/*  renderIcon={(props) => <Add size={16} {...props} />}*/}
-                    {/*  onClick={() => setShowOverlay(true)}*/}
-                    {/*>*/}
-                    {/*  {t("addPatientToList", "Add patient to list")}*/}
-                    {/*</Button>*/}
                   </Tile>
                 </div>
               ) : null}
@@ -215,16 +204,6 @@ const StockItemsTableComponent: React.FC<StockItemsTableProps> = () => {
             </TableContainer>
           )}
         </DataTable>
-        {/*{showOverlay && (*/}
-        {/*  <PatientSearch*/}
-        {/*    view={view}*/}
-        {/*    closePanel={() => setShowOverlay(false)}*/}
-        {/*    viewState={{*/}
-        {/*      selectedPatientUuid: viewState.selectedPatientUuid,*/}
-        {/*    }}*/}
-        {/*    headerTitle={overlayHeader}*/}
-        {/*  />*/}
-        {/*)}*/}
       </div>
     );
   }
