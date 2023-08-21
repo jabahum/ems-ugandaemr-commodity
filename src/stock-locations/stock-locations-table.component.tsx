@@ -117,7 +117,7 @@ const StockLocations: React.FC<StockLocationsTableProps> = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row, index) => {
+                  {rows.map((row) => {
                     return (
                       <React.Fragment key={row.id}>
                         <TableRow
