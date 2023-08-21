@@ -27,7 +27,7 @@ interface StockLocationsTableProps {
   status?: string;
 }
 
-const StockLocationsTableComponent: React.FC<StockLocationsTableProps> = () => {
+const StockLocations: React.FC<StockLocationsTableProps> = () => {
   const { t } = useTranslation();
 
   const {
@@ -190,4 +190,4 @@ const StockLocationsTableComponent: React.FC<StockLocationsTableProps> = () => {
   );
 };
 
-export default StockLocationsTableComponent;
+export default StockLocations;
