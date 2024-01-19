@@ -30,6 +30,10 @@
     {
       "name": "delete-stock-user-scope-modal",
       "component": "deleteUserScopeModal"
+    },
+    {
+      "name": "stock-management-app-menu-item",
+      "component": "stockManagementAppMenuItem"
     }
   ],
   "pages": [
