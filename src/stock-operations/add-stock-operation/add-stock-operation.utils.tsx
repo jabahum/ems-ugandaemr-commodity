@@ -1,6 +1,10 @@
 import { StockOperationDTO } from "../../core/api/types/stockOperation/StockOperationDTO";
 import { initialStockOperationValue } from "../../core/utils/utils";
-import { MAIN_STORE_LOCATION_TAG, today } from "../../constants";
+import {
+  MAIN_STORE_LOCATION_TAG,
+  TASK_STOCKMANAGEMENT_STOCKOPERATIONS_MUTATE,
+  today,
+} from "../../constants";
 import {
   operationFromString,
   StockOperationType,
@@ -22,10 +26,9 @@ import {
 import {
   getParties,
   getStockOperationTypes,
-  getUserRoleScopes,
 } from "../../stock-lookups/stock-lookups.resource";
 import { Party } from "../../core/api/types/Party";
-import { getCurrentUser } from "@openmrs/esm-framework";
+import { useState } from "react";
 
 export async function initializeNewStockOperation(
   currentStockOperationType: StockOperationType,
@@ -36,16 +39,8 @@ export async function initializeNewStockOperation(
   let model: StockOperationDTO;
   const isNew = !!stockOperation;
   const newItemsToCopy: StockOperationItemDTO[] = [];
+  const [atLocation, setAtLocation] = useState<string | null>();
   const showQuantityRequested = false;
-  const currentUserUuid = await new Promise((resolve, reject) => {
-    getCurrentUser().subscribe({
-      next: (user) => {
-        const userUuid = user?.user?.uuid;
-        resolve(userUuid);
-      },
-      error: (err) => reject(err),
-    });
-  });
   let operationTypes = stockOperationTypes;
   const canIssueStock =
     stockOperation?.permission?.isRequisitionAndCanIssueStock ?? false;
@@ -65,12 +60,13 @@ export async function initializeNewStockOperation(
   const shouldLockDestination =
     destinationTags.length === 1 &&
     destinationTags[0] === MAIN_STORE_LOCATION_TAG;
-  let location: string | null | undefined = null;
+  // let location: string | null | undefined = null;
   let sourcePartyList: Party[] | null | undefined;
   let destinationPartyList: Party[] | null | undefined;
 
   if (isNew) {
     model = structuredClone(initialStockOperationValue());
+    setAtLocation(model?.atLocationUuid);
     model = Object.assign(model, {
       operationDate: today(),
       operationTypeName: currentStockOperationType?.name,
@@ -78,26 +74,8 @@ export async function initializeNewStockOperation(
       operationType: currentStockOperationType?.operationType,
     });
     const partyList = await getParties();
-    const userRoleScopes = await getUserRoleScopes();
-    const currentUserRoleScope = userRoleScopes.data?.results?.filter(
-      (role) => role.userUuid === currentUserUuid
-    );
-    const userRoleScopeLocations = [
-      ...new Set(
-        currentUserRoleScope.flatMap((role) =>
-          role?.locations?.map((l) => l.locationUuid)
-        )
-      ),
-    ];
-
     if (!partyList.ok) throw Error("Error loading parties");
-    const filteredPartyList = partyList.data?.results?.filter(
-      (party) =>
-        userRoleScopeLocations.includes(party.locationUuid) ||
-        party.stockSourceUuid !== null
-    );
-
-    sourcePartyList = filteredPartyList?.filter(
+    sourcePartyList = partyList?.data?.results?.filter(
       (p) =>
         (p.locationUuid &&
           currentStockOperationType?.sourceType === LocationTypeLocation &&
@@ -111,7 +89,7 @@ export async function initializeNewStockOperation(
         const party = sourcePartyList[0];
         model.sourceUuid = party.uuid;
         model.sourceName = party.name;
-        location = party?.locationUuid;
+        setAtLocation(party?.locationUuid);
       }
     }
 
@@ -199,7 +177,7 @@ export async function initializeNewStockOperation(
           currentStockOperationType?.destinationType === LocationTypeOther)
       );
     },
-    location,
+    atLocation,
     sourcePartyList,
     destinationPartyList,
     stockOperationTypes: operationTypes,
